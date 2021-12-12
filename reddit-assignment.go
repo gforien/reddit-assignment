@@ -8,36 +8,38 @@ import (
 
 var db = make(map[string]string)
 
-func setupRouter() *gin.Engine {
-	r := gin.Default()
+func setupHTTPServer() *gin.Engine {
+	app := gin.Default()
 	counter := 0
 
 	// Get OK
-	r.GET("/ok", func(c *gin.Context) {
+	app.GET("/ok", func(c *gin.Context) {
 		c.String(http.StatusOK, "gin OK")
 	})
 
 	// Get counter
-	r.GET("/count", func(c *gin.Context) {
+	app.GET("/count", func(c *gin.Context) {
 		c.String(http.StatusOK, "%d", counter)
 	})
 
 	// Increment counter
-	r.POST("/inc", func(c *gin.Context) {
+	app.POST("/inc", func(c *gin.Context) {
 		counter++
 		c.String(http.StatusOK, "%d", counter)
 	})
 
 	// Decrement counter
-	r.POST("/dec", func(c *gin.Context) {
+	app.POST("/dec", func(c *gin.Context) {
 		counter--
 		c.String(http.StatusOK, "%d", counter)
 	})
 
-	return r
+	return app
 }
 
 func main() {
 	r := setupRouter()
 	r.Run(":5000")
+	app := setupHTTPServer()
+	app.Run(":5000")
 }
