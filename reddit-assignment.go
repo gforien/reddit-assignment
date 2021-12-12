@@ -11,6 +11,11 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 	counter := 0
 
+	// Get OK
+	r.GET("/ok", func(c *gin.Context) {
+		c.String(http.StatusOK, "gin OK")
+	})
+
 	// Get counter
 	r.GET("/count", func(c *gin.Context) {
 		c.String(http.StatusOK, "%d", counter)
