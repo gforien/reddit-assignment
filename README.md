@@ -92,3 +92,32 @@ docker run --rm --net reddit-assignment_default curlimages/curl curl -s -XPOST r
 docker run --rm --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
 # → 2
 ```
+
+### Docker Swarm
+
+On peut également déployer nos containers sur Docker Swarm, qui est un orchestrateur plus
+complet que Docker-compose, mais plus simple à prendre en main que Kubernetes.
+
+```powershell
+docker swarm init
+docker stack deploy -c docker-compose.yml reas
+```
+
+Après l'avoir lancé, on peut le tester ainsi
+```
+docker network ls
+# → reas_default
+docker service create `
+    --name test-swarm `
+    --network reas_default `
+    -d curlimages/curl curl -s -XPOST reas:5000/inc
+
+docker service logs -f test-swarm
+# → 1
+# → 2
+# → 3
+# → 4
+```
+*On lance ici un service, c'est-à-dire une tâche qui sera déployée sur tous les noeuds du
+cluster Swarm. Avec Docker Swarm on ne lance pas de containers indépendants, on lance au
+minimum un service qui sera déployé sur un seul noeud.*
