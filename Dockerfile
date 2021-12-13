@@ -1,4 +1,5 @@
 FROM golang:1.16-alpine
+LABEL org.opencontainers.image.source="https://github.com/gforien/reddit-assignment"
 
 WORKDIR /app
 
