@@ -13,6 +13,9 @@ COPY . .
 # Build
 RUN go build -o "./reas"
 
+# Remove source code
+RUN rm *.go
+
 # Run
 EXPOSE 5000
 CMD ["./reas"]
