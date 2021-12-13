@@ -35,8 +35,11 @@ local 6379 est exposé, ce qui ne se ferait pas forcément en production.**
 ## 2. Containerization
 
 ### Dockerfile
-- On a le choix entre les images `golang:1.17-buster` (Debian, 300 MB) et `golang:1.16-alpine`
-  (Alpine, 100 MB), et pas d'image slim-buster. On choisit la version Alpine.
+Images
+- Pour l'images Go on a le choix entre les images `golang:1.17-buster` (Debian, 300 MB)
+  et `golang:1.16-alpine` (Alpine, 100 MB), et pas d'image slim-buster. On choisit la 
+  version Alpine.
+- Pour l'image Redis, on choisit également la dernière version mineure basée sur Alpine.
 
 Nos containers vont maintenant s'exécuter sur des hôtes différents, au lieu d'être sur
 `localhost`. Il faut donc modifier le code Go pour qu'il puisse faire une résolution de
@@ -58,8 +61,10 @@ docker network create reas
 docker run --rm --name redis --net reas -p 6379:6379 -d redis
 docker build -t gforien/reas .
 docker run --rm --name reas --net reas -p 5000:5000 -d gforien/reas
+```
 
-# tests
+Après l'avoir lancé, on peut le tester ainsi
+```
 docker run --rm --name redis-test --net reas redis redis-cli -h redis ping
 # → PONG
 docker run --rm --name reas-test --net reas curlimages/curl curl -s reas:5000/ok
@@ -67,5 +72,22 @@ docker run --rm --name reas-test --net reas curlimages/curl curl -s reas:5000/ok
 docker run --rm --name reas-test --net reas curlimages/curl curl -s reas:5000/inc -XPOST
 # → 1
 docker run --rm --name reas-test --net reas curlimages/curl curl -s reas:5000/inc -XPOST
+# → 2
+```
+
+### Docker-compose
+
+On lance le cluster
+```powershell
+docker-compose up
+```
+
+Après l'avoir lancé, on peut le tester ainsi
+```
+docker network ls
+# → reddit-assignment_default
+docker run --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
+# → 1
+docker run --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
 # → 2
 ```
