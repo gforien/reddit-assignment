@@ -79,6 +79,7 @@ docker run --rm --name reas-test --net reas curlimages/curl curl -s reas:5000/in
 
 On lance le cluster
 ```powershell
+docker-compose build
 docker-compose up
 ```
 
