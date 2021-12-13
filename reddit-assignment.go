@@ -6,14 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"net/http"
+	"strconv"
 )
 
 var db = make(map[string]string)
 var redisContext = context.Background()
 
-func setupHTTPServer() *gin.Engine {
+func setupHTTPServer(client *redis.Client) *gin.Engine {
 	app := gin.Default()
-	counter := 0
+
+	err := client.Set(redisContext, "count", 0, 0).Err()
+	if err != nil {
+		panic(err)
+	}
 
 	// Get OK
 	app.GET("/ok", func(c *gin.Context) {
@@ -22,19 +27,33 @@ func setupHTTPServer() *gin.Engine {
 
 	// Get counter
 	app.GET("/count", func(c *gin.Context) {
-		c.String(http.StatusOK, "%d", counter)
+		sVal, err := client.Get(redisContext, "count").Result()
+		if err != nil {
+			panic(err)
+		}
+		iVal, err := strconv.Atoi(sVal)
+		if err != nil {
+			panic(err)
+		}
+		c.String(http.StatusOK, "%d", iVal)
 	})
 
 	// Increment counter
 	app.POST("/inc", func(c *gin.Context) {
-		counter++
-		c.String(http.StatusOK, "%d", counter)
+		val, err := client.Incr(redisContext, "count").Result()
+		if err != nil {
+			panic(err)
+		}
+		c.String(http.StatusOK, "%d", val)
 	})
 
 	// Decrement counter
 	app.POST("/dec", func(c *gin.Context) {
-		counter--
-		c.String(http.StatusOK, "%d", counter)
+		val, err := client.Decr(redisContext, "count").Result()
+		if err != nil {
+			panic(err)
+		}
+		c.String(http.StatusOK, "%d", val)
 	})
 
 	return app
@@ -73,8 +92,8 @@ func setupRedisClient(addr string) *redis.Client {
 }
 
 func main() {
-	_ = setupRedisClient("localhost:6379")
+	client := setupRedisClient("localhost:6379")
 
-	app := setupHTTPServer()
+	app := setupHTTPServer(client)
 	app.Run(":5000")
 }
