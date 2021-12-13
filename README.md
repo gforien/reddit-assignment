@@ -87,8 +87,8 @@ Après l'avoir lancé, on peut le tester ainsi
 ```
 docker network ls
 # → reddit-assignment_default
-docker run --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
+docker run --rm --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
 # → 1
-docker run --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
+docker run --rm --net reddit-assignment_default curlimages/curl curl -s -XPOST reas:5000/inc
 # → 2
 ```
