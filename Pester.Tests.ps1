@@ -1,6 +1,17 @@
 BeforeAll {
+    # Start a Redis container
+    $containerId = docker run --rm -p 6379:6379 -d redis
+
     # Start Go server and store process object
     $proc = Start-Process '.\reddit-assignment.exe' -PassThru
+}
+
+Describe 'Test redis container' {
+    It "should respond to ping" {
+        $res = docker exec -it $containerId redis-cli ping
+        $? | Should -Be $True
+        $res | Should -Be 'PONG'
+    }
 }
 
 Describe 'Test reddit-assignment.go' {
@@ -47,4 +58,7 @@ Describe 'Test reddit-assignment.go' {
 AfterAll {
     # Teardown the process started in BeforeAll block
     $proc | Stop-Process
+
+    # Teardown the Redis container
+    docker stop $containerId
 }
