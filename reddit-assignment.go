@@ -92,7 +92,7 @@ func setupRedisClient(addr string) *redis.Client {
 }
 
 func main() {
-	rdb := setupRedisClient("localhost:6379")
+	rdb := setupRedisClient("redis:6379")
 
 	app := setupHTTPServer(rdb)
 	app.Run(":5000")
